@@ -1,5 +1,8 @@
 "use strict";
 
+const logUtils = require("./utils/log-utils.js")
+const orderEntriesByDate = logUtils.orderEntriesByDate
+
 // Print all entries, across all of the *async* sources, in chronological order.
 
 module.exports = (logSources, printer) => {
@@ -8,12 +11,7 @@ module.exports = (logSources, printer) => {
     Promise.all(logSources.map( (source) => source.popAsync())).then( async (headEntries) => {
       while(headEntries.filter(entry => entry).length > 0){
         //order entry list
-        let orderedList = headEntries.sort((x, y) => {
-          if(!x && !y) return 0
-          if(!y) return -1
-          if(!x) return 1
-          return x.date.getTime() - y.date.getTime()
-        })
+        let orderedList = headEntries.sort(orderEntriesByDate)
         //print log
         printer.print(orderedList[0])
         //pop log from source where log was printed.
